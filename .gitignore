@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+*.ini
+/build
+.vscode/settings.json
