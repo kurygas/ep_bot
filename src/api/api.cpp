@@ -1,39 +1,38 @@
 #include "api.h"
-#include "request.h"
+#include "config.h"
 
-bool Api::userExist(const int64_t tgId) {
-    auto r = Request::get("user/");
-
-    if (r.status_code != 200) {
-        throw std::runtime_error("api error");
-    }
-
-    auto json = json::parse(r.text);
-
-    for (const auto& userId : json["user_list"].get<std::vector<int64_t>>()) {
-        r = Request::get("user/" + std::to_string(userId));
-        json = json::parse(r.text);
-
-        if (r.status_code == 200 && json["tg_id"].get<int64_t>() == tgId) {
-            return true;
-        }
-    }
-
-    return false;
+cpr::Response Api::get(const std::string& url, const json& json) {
+    return cpr::Get(
+        cpr::Url{Config::apiUrl + url},
+        cpr::Bearer{Config::apiToken},
+        cpr::Body{json.dump()},
+        cpr::Header{{"Content-Type", "application/json"}}
+    );
 }
 
-void Api::registerUser(const json& payload) {
-    if (Request::post("user/", payload).status_code != 201) {
-        throw std::runtime_error("");
-    }
+cpr::Response Api::post(const std::string& url, const json& json) {
+    return cpr::Post(
+        cpr::Url{Config::apiUrl + url},
+        cpr::Bearer{Config::apiToken},
+        cpr::Body{json.dump()},
+        cpr::Header{{"Content-Type", "application/json"}}
+    );
 }
 
-void Api::createGroup(const json& payload) {
-    if (Request::post("group/", payload).status_code != 201) {
-        throw std::runtime_error("");
-    }
+cpr::Response Api::del(const std::string& url, const json& json) {
+    return cpr::Delete(
+        cpr::Url{Config::apiUrl + url},
+        cpr::Bearer{Config::apiToken},
+        cpr::Body{json.dump()},
+        cpr::Header{{"Content-Type", "application/json"}}
+    );
 }
 
-bool Api::isUserTeacher(const int userId) {
-    
+cpr::Response Api::patch(const std::string& url, const json& json) {
+    return cpr::Patch(
+        cpr::Url{Config::apiUrl + url},
+        cpr::Bearer{Config::apiToken},
+        cpr::Body{json.dump()},
+        cpr::Header{{"Content-Type", "application/json"}}
+    );
 }

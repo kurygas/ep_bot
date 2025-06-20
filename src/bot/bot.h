@@ -5,6 +5,7 @@
 
 #include <unordered_map>
 #include <cstdint>
+#include <memory>
 #include <functional>
 #include <tgbot/tgbot.h>
 #include <nlohmann/json.hpp>
@@ -16,5 +17,5 @@ public:
     Bot();
 
 private:
-    std::unordered_map<int64_t, CommandHandler> stateMap_;
+    std::unordered_map<int64_t, std::unique_ptr<CommandHandler>> commandMap_;
 };

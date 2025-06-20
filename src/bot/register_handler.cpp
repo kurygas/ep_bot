@@ -14,7 +14,14 @@ RegisterHandler::RegisterHandler(Bot& bot, const TgBot::Message::Ptr& message)
 
 void RegisterHandler::getName(const TgBot::Message::Ptr& message) {
     json_["name"] = message->text;
-    Api::registerUser(json_);
+    const auto r = Api::post("user", json_);
+
+    if (r.status_code != 201) {
+        throw std::runtime_error("");
+    }
+
+    bot_.getApi().sendMessage(message->chat->id, "Успешная регистрация");
+    finished_ = true;
 }
 
 void RegisterHandler::getSurname(const TgBot::Message::Ptr& message) {
