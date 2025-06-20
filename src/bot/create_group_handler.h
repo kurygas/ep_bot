@@ -4,8 +4,9 @@
 
 class CreateGroupHandler : public CommandHandler {
 public:
-    explicit CreateGroupHandler(Bot& bot, const TgBot::Message::Ptr& message);
+    using CommandHandler::CommandHandler;
 
 private:
+    void start(const TgBot::Message::Ptr& message) override;
     void getName(const TgBot::Message::Ptr& message);
 };

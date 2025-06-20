@@ -3,35 +3,37 @@
 #include "register_handler.h"
 #include "create_group_handler.h"
 #include "add_to_group_handler.h"
+#include "create_problem_handler.h"
 
 Bot::Bot()
 : TgBot::Bot(Config::botToken) {
     getEvents().onCommand("register", [this](const TgBot::Message::Ptr& message) {
-        commandMap_[message->from->id] = std::make_unique<RegisterHandler>(*this, message);
+        createHandler<RegisterHandler>(message);
+        process(message);
     });
 
     getEvents().onCommand("create_group", [this](const TgBot::Message::Ptr& message) {
-        commandMap_[message->from->id] = std::make_unique<CreateGroupHandler>(*this, message);
+        createHandler<CreateGroupHandler>(message);
+        process(message);
     });
 
     getEvents().onCommand("add_to_group", [this](const TgBot::Message::Ptr& message) {
-        commandMap_[message->from->id] = std::make_unique<AddToGroupHandler>(*this, message);
+        createHandler<AddToGroupHandler>(message);
+        process(message);
+    });
+
+    getEvents().onCommand("create_problem", [this](const TgBot::Message::Ptr& message) {
+        createHandler<CreateProblemHandler>(message);
+        process(message);
     });
 
     getEvents().onAnyMessage([this](const TgBot::Message::Ptr& message) {
-        if (commandMap_.contains(message->from->id)) {
-            try {
-                commandMap_[message->from->id]->processMessage(message);
-            }
-            catch (...) {
-                getApi().sendMessage(message->chat->id, "Упс! Произошла ошибка");
-                commandMap_.erase(message->from->id);
-            }
+        process(message);
+    });
 
-            if (commandMap_.contains(message->from->id) && commandMap_[message->from->id]->isFinished()) {
-                commandMap_.erase(message->from->id);
-            }
-        }
+    getEvents().onCallbackQuery([this](const TgBot::CallbackQuery::Ptr& callbackQuery) {
+        process(callbackQuery);
+        getApi().answerCallbackQuery(callbackQuery->id);
     });
 
     TgBot::TgLongPoll longPoll(*this);

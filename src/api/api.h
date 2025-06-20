@@ -22,7 +22,7 @@ namespace Api {
         }
 
         for (const auto& id : json::parse(r.text)["list"].get<std::vector<int>>()) {
-            r = Api::get(url + std::to_string(id));
+            r = Api::get(url + '/' + std::to_string(id));
             
             if (r.status_code == 200 && json::parse(r.text)[key].get<T>() == value) {
                 return id;

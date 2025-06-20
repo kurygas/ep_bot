@@ -2,8 +2,7 @@
 #include "bot.h"
 #include "api.h"
 
-RegisterHandler::RegisterHandler(Bot& bot, const TgBot::Message::Ptr& message)
-: CommandHandler(bot) {
+void RegisterHandler::start(const TgBot::Message::Ptr& message) {
     json_["tg_id"] = message->from->id;
     json_["tg_username"] = message->from->username;
     bot_.getApi().sendMessage(message->chat->id, "Введите вашу фамилию (на кириллице)");
@@ -17,11 +16,11 @@ void RegisterHandler::getName(const TgBot::Message::Ptr& message) {
     const auto r = Api::post("user", json_);
 
     if (r.status_code != 201) {
-        throw std::runtime_error("");
+        throw std::runtime_error("Ошибка при регистрации");
     }
 
     bot_.getApi().sendMessage(message->chat->id, "Успешная регистрация");
-    finished_ = true;
+    nextCommand_ = std::monostate();
 }
 
 void RegisterHandler::getSurname(const TgBot::Message::Ptr& message) {

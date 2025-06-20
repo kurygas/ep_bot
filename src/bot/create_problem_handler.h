@@ -2,12 +2,11 @@
 
 #include "command_handler.h"
 
-class RegisterHandler : public CommandHandler {
+class CreateProblemHandler : public CommandHandler {
 public:
     using CommandHandler::CommandHandler;
 
 private:
     void start(const TgBot::Message::Ptr& message) override;
-    void getName(const TgBot::Message::Ptr& message);
-    void getSurname(const TgBot::Message::Ptr& message);
+    void getSubject(const TgBot::CallbackQuery::Ptr& message);
 };

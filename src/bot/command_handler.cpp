@@ -3,14 +3,14 @@
 #include "api.h"
 
 CommandHandler::CommandHandler(Bot& bot)
-: bot_(bot) {}
-
-void CommandHandler::processMessage(const TgBot::Message::Ptr& message) {
-    nextCommand_(message);
+: bot_(bot) {
+    nextCommand_ = [this](const TgBot::Message::Ptr& message) {
+        start(message);
+    };
 }
 
 bool CommandHandler::isFinished() const {
-    return finished_;
+    return std::holds_alternative<std::monostate>(nextCommand_);
 }
 
 std::vector<std::string> CommandHandler::split(const std::string& str) {
@@ -34,10 +34,9 @@ std::vector<std::string> CommandHandler::split(const std::string& str) {
     return result;
 }
 
-void CommandHandler::checkRegistration(const TgBot::Message::Ptr &message)
-{
+void CommandHandler::checkRegistration(const TgBot::Message::Ptr& message) {
     try {
-        Api::getId("user/", "tg_id", message->from->id);
+        Api::getId("user", "tg_id", message->from->id);
     }
     catch (...) {
         bot_.getApi().sendMessage(message->chat->id, "Вы не зарегестрированы");
@@ -47,7 +46,7 @@ void CommandHandler::checkRegistration(const TgBot::Message::Ptr &message)
 
 void CommandHandler::checkTeacher(const TgBot::Message::Ptr& message) {
     checkRegistration(message);
-    const auto r = Api::get("user/" + std::to_string(Api::getId("user/", "tg_id", message->from->id)));
+    const auto r = Api::get("user/" + std::to_string(Api::getId("user", "tg_id", message->from->id)));
 
     if (json::parse(r.text)["user_type"].get<int>() == 0) {
         bot_.getApi().sendMessage(message->chat->id, "У вас недостаточно прав");
