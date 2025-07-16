@@ -18,4 +18,5 @@ void CreateGroupHandler::getName(const TgBot::Message::Ptr& message) {
     }
 
     bot_.getApi().sendMessage(message->chat->id, "Группа создана");
+    nextCommand_ = std::monostate();
 }

@@ -25,36 +25,20 @@ public:
 
     bool isFinished() const;
 
-    static std::vector<std::string> split(const std::string& str);
-
     virtual ~CommandHandler() = default;
+
+    static std::vector<std::string> split(const std::string& str, char splitter = ' ');
+    static long long getTime(int day, int month, int year, int h = 0, int min = 0, int sec = 0);
 
 protected:
     virtual void start(const TgBot::Message::Ptr& message) = 0;
     void checkRegistration(const TgBot::Message::Ptr& message);
     void checkTeacher(const TgBot::Message::Ptr& message);
 
-    template<typename... T>
-    static TgBot::InlineKeyboardMarkup::Ptr createKeyboard(const std::pair<std::string, std::string>& data, const T&... args) {
-        const auto keyboard = createKeyboard(args...);
-        const auto button = std::make_shared<TgBot::InlineKeyboardButton>();
-        button->text = data.first;
-        button->callbackData = data.second;
-        keyboard->inlineKeyboard.push_back({button});
-        return keyboard;
-    }
+    static TgBot::InlineKeyboardMarkup::Ptr createKeyboard(const std::vector<std::pair<std::string, std::string>>& data);
+    static TgBot::InlineKeyboardMarkup::Ptr createSubjectKeyboard();
 
     Bot& bot_;
     json json_;
     std::variant<std::monostate, MessageHandler, CallbackQueryHandler> nextCommand_;
 };
-
-template<>
-inline TgBot::InlineKeyboardMarkup::Ptr CommandHandler::createKeyboard(const std::pair<std::string, std::string>& data) {
-        const auto keyboard = std::make_shared<TgBot::InlineKeyboardMarkup>();
-        const auto button = std::make_shared<TgBot::InlineKeyboardButton>();
-        button->text = data.first;
-        button->callbackData = data.second;
-        keyboard->inlineKeyboard.push_back({button});
-        return keyboard;
-}

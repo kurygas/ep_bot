@@ -23,14 +23,14 @@ private:
             try {
                 commandMap_[data->from->id]->process(data);
             }
-            catch (const std::runtime_error& e) {
+            catch (...) {
                 commandMap_.erase(data->from->id);
 
                 if constexpr (std::is_same_v<T, TgBot::CallbackQuery::Ptr>) {
-                    getApi().sendMessage(data->message->chat->id, e.what());
+                    getApi().sendMessage(data->message->chat->id, "Произошла ошибка");
                 }
                 else {
-                    getApi().sendMessage(data->chat->id, e.what());
+                    getApi().sendMessage(data->chat->id, "Произошла ошибка");
                 }
                 
                 return;

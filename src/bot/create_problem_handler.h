@@ -8,5 +8,8 @@ public:
 
 private:
     void start(const TgBot::Message::Ptr& message) override;
-    void getSubject(const TgBot::CallbackQuery::Ptr& message);
+    void getName(const TgBot::Message::Ptr& message);
+    void getStatement(const TgBot::Message::Ptr& message);
+    void getSubject(const TgBot::CallbackQuery::Ptr& callbackQuery);
+    void getSemesterNumber(const TgBot::Message::Ptr& message);
 };

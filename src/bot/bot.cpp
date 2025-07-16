@@ -4,6 +4,7 @@
 #include "create_group_handler.h"
 #include "add_to_group_handler.h"
 #include "create_problem_handler.h"
+#include "create_semester_handler.h"
 
 Bot::Bot()
 : TgBot::Bot(Config::botToken) {
@@ -24,6 +25,11 @@ Bot::Bot()
 
     getEvents().onCommand("create_problem", [this](const TgBot::Message::Ptr& message) {
         createHandler<CreateProblemHandler>(message);
+        process(message);
+    });
+
+    getEvents().onCommand("create_semester", [this](const TgBot::Message::Ptr& message) {
+        createHandler<CreateSemesterHandler>(message);
         process(message);
     });
 

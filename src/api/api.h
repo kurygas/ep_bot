@@ -8,23 +8,21 @@
 using json = nlohmann::json;
 
 namespace Api {
-    cpr::Response get(const std::string& url, const json& json = json());
-    cpr::Response post(const std::string& url, const json& json = json());
-    cpr::Response patch(const std::string& url, const json& json = json());
-    cpr::Response del(const std::string& url, const json& json = json());
+    cpr::Response get(const std::string& url);
+    cpr::Response post(const std::string& url, const json& json);
+    cpr::Response patchId(const std::string& url, int id, const json& json);
+    cpr::Response delId(const std::string& url, int id);
+    cpr::Response getId(const std::string& url, int id, const std::string& method = "");
+    cpr::Response postId(const std::string& url, int id, const std::string& method, const json& json);
     
     template<typename T>
-    int getId(const std::string& url, const std::string& key, const T& value) {
-        auto r = Api::get(url);
+    int findId(const std::string& url, const std::string& key, const T& value) {
+        const auto list = json::parse(Api::get(url).text);
 
-        if (r.status_code != 200) {
-            throw std::runtime_error("");
-        }
-
-        for (const auto& id : json::parse(r.text)["list"].get<std::vector<int>>()) {
-            r = Api::get(url + '/' + std::to_string(id));
+        for (const auto& id : list) {
+            const auto obj = json::parse(Api::getId(url, id).text);
             
-            if (r.status_code == 200 && json::parse(r.text)[key].get<T>() == value) {
+            if (obj[key] == value) {
                 return id;
             }
         }
